@@ -30,6 +30,20 @@ def create_endpoint_handler(
 ) -> None:
     """Create handler for a specific endpoint"""
 
+    def get_field(payload: dict, field: str, default=None):
+        """Get field value using field_map or direct access"""
+        mapped = endpoint_config.field_map.get(field)
+        if mapped:
+            # Support nested fields with dot notation
+            value = payload
+            for key in mapped.split("."):
+                if isinstance(value, dict):
+                    value = value.get(key)
+                else:
+                    return default
+            return value if value is not None else default
+        return payload.get(field, default)
+
     async def handler(
         payload: dict[str, Any],
         x_api_key: str | None = Header(None),
@@ -38,7 +52,7 @@ def create_endpoint_handler(
             raise HTTPException(status_code=401, detail="Invalid API key")
 
         try:
-            chat_id = payload.get("chat_id") or endpoint_config.chat_id
+            chat_id = get_field(payload, "chat_id") or endpoint_config.chat_id
 
             formatter = registry.get_formatter(endpoint_config.formatter)
             if not formatter:
@@ -56,11 +70,11 @@ def create_endpoint_handler(
             else:
                 formatted_message = formatter.format(payload)
 
-            parse_mode = payload.get("parse_mode") or endpoint_config.parse_mode
+            parse_mode = get_field(payload, "parse_mode") or endpoint_config.parse_mode
 
             # Send to Telegram
-            image_url = payload.get("image_url")
-            image_urls = payload.get("image_urls", [])
+            image_url = get_field(payload, "image_url")
+            image_urls = get_field(payload, "image_urls", [])
 
             if image_urls:
                 result = await bot.send_media_group(
@@ -87,7 +101,7 @@ def create_endpoint_handler(
 
             return {
                 "status": "sent",
-                "message_id": result.get("result", {}).get("message_id"),
+                "message_id": result.get("result", {}).get("message_id") if isinstance(result.get("result"), dict) else result.get("result", [{}])[0].get("message_id"),
                 "chat_id": chat_id,
             }
 

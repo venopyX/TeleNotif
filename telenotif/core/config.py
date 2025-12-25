@@ -33,6 +33,7 @@ class EndpointConfig(BaseModel):
     parse_mode: str | None = Field(default=None, description="Telegram parse mode")
     plugin_config: dict[str, Any] = Field(default_factory=dict)
     labels: dict[str, str] = Field(default_factory=dict, description="Custom labels for keys")
+    field_map: dict[str, str] = Field(default_factory=dict, description="Map payload fields to internal fields")
 
     @field_validator("path")
     @classmethod

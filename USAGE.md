@@ -229,18 +229,21 @@ curl -X POST http://localhost:8000/notify \
 
 ## Message Templates
 
-Define reusable message templates with variable substitution.
+Define reusable message templates with Jinja2 syntax.
 
 ### Configuration
 
 ```yaml
 templates:
   order_received: |
-    🛒 *New Order \#{order_id}*
+    🛒 *New Order \#{{ order_id }}*
     
-    👤 Customer: {customer}
-    💰 Total: {total}
-    📦 Items: {items_count}
+    👤 Customer: {{ customer }}
+    💰 Total: {{ total }}
+    
+    {% if items %}📦 Items:
+    {% for item in items %}• {{ item }}
+    {% endfor %}{% endif %}
 
 endpoints:
   - path: "/orders"
@@ -258,7 +261,7 @@ curl -X POST http://localhost:8000/orders \
     "order_id": "12345",
     "customer": "John Doe",
     "total": "$99.99",
-    "items_count": "3"
+    "items": ["T-Shirt (x2)", "Jeans (x1)"]
   }'
 ```
 
@@ -269,8 +272,18 @@ curl -X POST http://localhost:8000/orders \
 
 👤 Customer: John Doe
 💰 Total: $99.99
-📦 Items: 3
+
+📦 Items:
+• T-Shirt (x2)
+• Jeans (x1)
 ```
+
+### Jinja2 Features
+
+- Variables: `{{ variable }}`
+- Conditionals: `{% if condition %}...{% endif %}`
+- Loops: `{% for item in items %}...{% endfor %}`
+- Filters: `{{ name|upper }}`, `{{ price|default('N/A') }}`
 
 **Note:** When using `parse_mode: "MarkdownV2"`, variable values are automatically escaped.
 

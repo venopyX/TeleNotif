@@ -84,10 +84,10 @@ bot:
 ```yaml
 templates:
   order_received: |
-    🛒 *New Order \#{order_id}*
+    🛒 *New Order \#{{ order_id }}*
     
-    Customer: {customer}
-    Total: {total}
+    Customer: {{ customer }}
+    Total: {{ total }}
 ```
 
 ### Endpoint Configuration

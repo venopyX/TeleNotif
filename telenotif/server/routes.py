@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Header
+from jinja2 import Template
 
 from telenotif.core.config import EndpointConfig
 from telenotif.core.interfaces import IPlugin
@@ -48,12 +49,18 @@ def create_endpoint_handler(
         return payload.get(field, default)
 
     def render_template(template_str: str, payload: dict, parse_mode: str | None) -> str:
-        """Render template with payload values"""
-        result = template_str
-        for key, value in payload.items():
-            val = escape_markdown_v2(str(value)) if parse_mode == "MarkdownV2" else str(value)
-            result = result.replace(f"{{{key}}}", val)
-        return result
+        """Render Jinja2 template with payload values"""
+        def escape_value(v):
+            if isinstance(v, list):
+                return [escape_markdown_v2(str(i)) if not isinstance(i, (dict, list)) else i for i in v]
+            if isinstance(v, dict):
+                return {k: escape_value(val) for k, val in v.items()}
+            return escape_markdown_v2(str(v))
+
+        if parse_mode == "MarkdownV2":
+            escaped_payload = {k: escape_value(v) for k, v in payload.items()}
+            return Template(template_str).render(**escaped_payload)
+        return Template(template_str).render(**payload)
 
     async def handler(
         payload: dict[str, Any],

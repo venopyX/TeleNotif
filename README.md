@@ -168,12 +168,17 @@ Success:
 }
 ```
 
-Error:
+Error (structured JSON):
 ```json
 {
-  "detail": "Error message"
+  "detail": {
+    "error": "invalid_api_key",
+    "message": "Invalid or missing API key"
+  }
 }
 ```
+
+Error codes: `invalid_api_key`, `formatter_not_found`, `send_failed`
 
 ## Getting Your Chat ID
 

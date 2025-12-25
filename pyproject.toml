@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "telenotif"
-version = "1.0.0"
+version = "0.9.0"
 description = "Simple Telegram notification framework with plugin support"
 authors = ["Gemechis Chala <gladsonchala@gmail.com>"]
 license = "MIT"

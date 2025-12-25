@@ -120,9 +120,11 @@ def create_endpoint_handler(
                 "chat_id": chat_id,
             }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"Failed to send notification: {e}", exc_info=True)
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail={"error": "send_failed", "message": str(e)})
 
     app.post(endpoint_config.path)(handler)
     logger.info(f"Registered endpoint: {endpoint_config.path}")

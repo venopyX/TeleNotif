@@ -79,6 +79,17 @@ bot:
   test_mode: false                 # Log instead of sending (for testing)
 ```
 
+### Templates
+
+```yaml
+templates:
+  order_received: |
+    🛒 *New Order \#{order_id}*
+    
+    Customer: {customer}
+    Total: {total}
+```
+
 ### Endpoint Configuration
 
 ```yaml
@@ -86,6 +97,7 @@ endpoints:
   - path: "/webhook/orders"        # HTTP endpoint path
     chat_id: "8345389653"          # Telegram chat/group/channel ID
     formatter: "markdown"          # plain, markdown, or plugin name
+    template: "order_received"     # Use template instead of formatter
     parse_mode: "MarkdownV2"       # Telegram parse mode
     labels:                        # Custom display labels
       order_id: "🆔 Order"

@@ -2,6 +2,7 @@
 
 from telenotif.formatters.plain import PlainFormatter
 from telenotif.formatters.markdown import MarkdownFormatter
+from telenotif.utils import escape_markdown_v2
 
 
 def test_plain_formatter_simple_message():
@@ -24,3 +25,19 @@ def test_markdown_formatter():
     formatter = MarkdownFormatter()
     result = formatter.format({"title": "Alert", "message": "Test"})
     assert "*Alert*" in result
+
+
+def test_markdown_formatter_with_labels():
+    """Test markdown formatter with custom labels"""
+    formatter = MarkdownFormatter(labels={"order_id": "🆔 Order"})
+    result = formatter.format({"order_id": "123"})
+    assert "🆔 Order" in result
+
+
+def test_escape_markdown_v2():
+    """Test MarkdownV2 escaping"""
+    text = "Hello_World! Price: $99.99"
+    escaped = escape_markdown_v2(text)
+    assert "\\_" in escaped
+    assert "\\!" in escaped
+    assert "\\." in escaped

@@ -6,6 +6,7 @@ Complete guide for using TeleNotif in your projects.
 
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Message Templates](#message-templates)
 - [Sending Notifications](#sending-notifications)
 - [Formatters](#formatters)
 - [Custom Plugins](#custom-plugins)
@@ -88,7 +89,19 @@ export API_KEY="your-secret-key"
 ```yaml
 bot:
   token: "${TELEGRAM_BOT_TOKEN}"
-  test_mode: false              # Set true to log instead of send
+  test_mode: false
+
+templates:
+  order_received: |
+    🛒 *New Order \#{order_id}*
+    
+    👤 Customer: {customer}
+    💰 Total: {total}
+    📦 Items: {items_count}
+  
+  alert: |
+    ⚠️ *{title}*
+    {message}
 
 endpoints:
   # Simple text notifications
@@ -96,9 +109,15 @@ endpoints:
     chat_id: "8345389653"
     formatter: "plain"
 
-  # Formatted order notifications
+  # Using template
   - path: "/webhook/orders"
-    chat_id: "-1001234567890"   # Group/channel ID
+    chat_id: "-1001234567890"
+    template: "order_received"
+    parse_mode: "MarkdownV2"
+
+  # Formatted with labels
+  - path: "/webhook/products"
+    chat_id: "-1001234567890"
     formatter: "markdown"
     parse_mode: "MarkdownV2"
     labels:
@@ -205,6 +224,55 @@ curl -X POST http://localhost:8000/notify \
     "chat_id": "987654321"
   }'
 ```
+
+---
+
+## Message Templates
+
+Define reusable message templates with variable substitution.
+
+### Configuration
+
+```yaml
+templates:
+  order_received: |
+    🛒 *New Order \#{order_id}*
+    
+    👤 Customer: {customer}
+    💰 Total: {total}
+    📦 Items: {items_count}
+
+endpoints:
+  - path: "/orders"
+    chat_id: "8345389653"
+    template: "order_received"
+    parse_mode: "MarkdownV2"
+```
+
+### Sending
+
+```bash
+curl -X POST http://localhost:8000/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "order_id": "12345",
+    "customer": "John Doe",
+    "total": "$99.99",
+    "items_count": "3"
+  }'
+```
+
+### Output
+
+```
+🛒 New Order #12345
+
+👤 Customer: John Doe
+💰 Total: $99.99
+📦 Items: 3
+```
+
+**Note:** When using `parse_mode: "MarkdownV2"`, variable values are automatically escaped.
 
 ---
 

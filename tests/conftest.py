@@ -14,6 +14,9 @@ def sample_config():
             "token": "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
             "test_mode": True,
         },
+        "templates": {
+            "test_template": "Hello {name}!",
+        },
         "endpoints": [
             {
                 "path": "/notify/test",

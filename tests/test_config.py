@@ -22,3 +22,4 @@ def test_app_config_loading(sample_config):
     assert config.bot.token
     assert len(config.endpoints) == 1
     assert config.server.port == 8000
+    assert "test_template" in config.templates

@@ -42,9 +42,11 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
         registry.discover_plugins(str(plugins_dir))
         logger.info(f"Loaded formatters: {', '.join(registry.list_formatters())}")
 
+    # Store in app state
     app.state.config = config
     app.state.bot = bot
     app.state.registry = registry
+    app.state.templates = config.templates
 
     setup_routes(app)
 

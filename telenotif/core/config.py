@@ -30,6 +30,7 @@ class EndpointConfig(BaseModel):
     path: str = Field(..., description="API endpoint path")
     chat_id: str = Field(..., description="Telegram chat ID or username")
     formatter: str = Field(default="plain", description="Formatter to use")
+    template: str | None = Field(default=None, description="Template name to use")
     parse_mode: str | None = Field(default=None, description="Telegram parse mode")
     plugin_config: dict[str, Any] = Field(default_factory=dict)
     labels: dict[str, str] = Field(default_factory=dict, description="Custom labels for keys")
@@ -74,5 +75,6 @@ class AppConfig(BaseModel):
 
     bot: BotConfig
     endpoints: list[EndpointConfig]
+    templates: dict[str, str] = Field(default_factory=dict, description="Message templates")
     server: ServerConfig = Field(default_factory=ServerConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)

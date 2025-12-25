@@ -5,8 +5,8 @@ description = "Simple Telegram notification framework with plugin support"
 authors = ["Gemechis Chala <gladsonchala@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/yourusername/telenotif"
-repository = "https://github.com/yourusername/telenotif"
+homepage = "https://github.com/venopyx/telenotif"
+repository = "https://github.com/venopyx/telenotif"
 keywords = ["telegram", "notifications", "bot", "webhook"]
 classifiers = [
     "Development Status :: 4 - Beta",

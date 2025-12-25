@@ -16,9 +16,10 @@ def setup_routes(app: FastAPI) -> None:
     config = app.state.config
     bot = app.state.bot
     registry = app.state.registry
+    templates = app.state.templates
 
     for endpoint_config in config.endpoints:
-        create_endpoint_handler(app, endpoint_config, bot, registry, config.server.api_key)
+        create_endpoint_handler(app, endpoint_config, bot, registry, config.server.api_key, templates)
 
 
 def create_endpoint_handler(
@@ -27,6 +28,7 @@ def create_endpoint_handler(
     bot,
     registry,
     api_key: str | None,
+    templates: dict[str, str],
 ) -> None:
     """Create handler for a specific endpoint"""
 
@@ -44,6 +46,20 @@ def create_endpoint_handler(
             return value if value is not None else default
         return payload.get(field, default)
 
+    def render_template(template_str: str, payload: dict, parse_mode: str | None) -> str:
+        """Render template with payload values"""
+        def escape_markdown(text: str) -> str:
+            """Escape special MarkdownV2 characters in values"""
+            for char in ["_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
+                text = str(text).replace(char, f"\\{char}")
+            return text
+
+        result = template_str
+        for key, value in payload.items():
+            val = escape_markdown(str(value)) if parse_mode == "MarkdownV2" else str(value)
+            result = result.replace(f"{{{key}}}", val)
+        return result
+
     async def handler(
         payload: dict[str, Any],
         x_api_key: str | None = Header(None),
@@ -54,21 +70,25 @@ def create_endpoint_handler(
         try:
             chat_id = get_field(payload, "chat_id") or endpoint_config.chat_id
 
-            formatter = registry.get_formatter(endpoint_config.formatter)
-            if not formatter:
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Formatter '{endpoint_config.formatter}' not found",
-                )
-
-            # Set labels if formatter supports it
-            if hasattr(formatter, "labels"):
-                formatter.labels = endpoint_config.labels
-
-            if isinstance(formatter, IPlugin):
-                formatted_message = formatter.format(payload, endpoint_config.plugin_config)
+            # Use template if specified, otherwise use formatter
+            if endpoint_config.template and endpoint_config.template in templates:
+                formatted_message = render_template(templates[endpoint_config.template], payload, parse_mode)
             else:
-                formatted_message = formatter.format(payload)
+                formatter = registry.get_formatter(endpoint_config.formatter)
+                if not formatter:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Formatter '{endpoint_config.formatter}' not found",
+                    )
+
+                # Set labels if formatter supports it
+                if hasattr(formatter, "labels"):
+                    formatter.labels = endpoint_config.labels
+
+                if isinstance(formatter, IPlugin):
+                    formatted_message = formatter.format(payload, endpoint_config.plugin_config)
+                else:
+                    formatted_message = formatter.format(payload)
 
             parse_mode = get_field(payload, "parse_mode") or endpoint_config.parse_mode
 

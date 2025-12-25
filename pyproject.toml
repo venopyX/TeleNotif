@@ -2,7 +2,7 @@
 name = "telenotif"
 version = "1.0.0"
 description = "Simple Telegram notification framework with plugin support"
-authors = ["Your Name <you@example.com>"]
+authors = ["Gemechis Chala <gladsonchala@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/yourusername/telenotif"

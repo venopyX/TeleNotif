@@ -43,6 +43,23 @@ class EndpointConfig(BaseModel):
             return f"/{v}"
         return v
 
+    @field_validator("chat_id")
+    @classmethod
+    def validate_chat_id(cls, v: str) -> str:
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        if v.startswith("@"):
+            return v
+        try:
+            chat_id_int = int(v)
+            # Warn if looks like channel/supergroup but missing -100 prefix
+            if chat_id_int > 0 and len(v) > 10:
+                logger.warning(f"chat_id '{v}' looks like a channel ID but is positive. Did you mean '-100{v}'?")
+        except ValueError:
+            logger.warning(f"chat_id '{v}' is not a valid numeric ID or @username")
+        return v
+
 
 class ServerConfig(BaseModel):
     """Server configuration"""

@@ -2,11 +2,17 @@
 
 ## Completed
 - [x] Version bump to 0.9.0 (pyproject.toml, __version__.py, cli)
+- [x] Structured error responses in routes.py
+- [x] Chat ID validation warning in EndpointConfig
+- [x] Media caption on first photo only (already implemented correctly)
 
 ## In Progress
-- [ ] Structured error responses in routes.py
+- [ ] Update docs to reflect changes
 
-## Remaining
-- [ ] Chat ID validation warning in EndpointConfig
-- [ ] Update docs to reflect version change
-- [ ] Commit all changes
+## Remaining (This Session)
+- [ ] Jinja2 template engine
+
+## Future (YAGNI for now)
+- [ ] Rate limiting (slowapi)
+- [ ] Entry-point plugin discovery
+- [ ] structlog / request ID correlation

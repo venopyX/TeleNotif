@@ -23,6 +23,7 @@ class TelegramBot:
         chat_id: str,
         text: str,
         parse_mode: str | None = None,
+        reply_markup: dict | None = None,
         max_retries: int = 3,
     ) -> dict:
         """Send text message to Telegram"""
@@ -33,6 +34,8 @@ class TelegramBot:
         payload = {"chat_id": chat_id, "text": text}
         if parse_mode:
             payload["parse_mode"] = parse_mode
+        if reply_markup:
+            payload["reply_markup"] = reply_markup
 
         return await self._send_with_retry("sendMessage", payload, max_retries)
 
@@ -119,3 +122,31 @@ class TelegramBot:
                     raise
 
         raise Exception(f"Failed to send message after {max_retries} attempts")
+
+    async def set_webhook(self, url: str) -> dict:
+        """Set webhook URL for receiving updates"""
+        payload = {"url": url}
+        return await self._send_with_retry("setWebhook", payload, 1)
+
+    async def delete_webhook(self) -> dict:
+        """Delete webhook"""
+        return await self._send_with_retry("deleteWebhook", {}, 1)
+
+    async def get_webhook_info(self) -> dict:
+        """Get current webhook info"""
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{self.base_url}getWebhookInfo") as response:
+                return await response.json()
+
+    async def answer_callback_query(
+        self,
+        callback_query_id: str,
+        text: str | None = None,
+        show_alert: bool = False,
+    ) -> dict:
+        """Answer callback query from inline keyboard"""
+        payload = {"callback_query_id": callback_query_id}
+        if text:
+            payload["text"] = text
+        payload["show_alert"] = show_alert
+        return await self._send_with_retry("answerCallbackQuery", payload, 1)

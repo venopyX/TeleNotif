@@ -197,5 +197,111 @@ def validate(config: str):
         click.echo(f"✗ Configuration error: {e}", err=True)
 
 
+@cli.group()
+def webhook():
+    """Manage Telegram webhook"""
+    pass
+
+
+@webhook.command("setup")
+@click.option("--config", default="config.yaml", help="Path to config file")
+@click.option("--url", default=None, help="Override webhook URL")
+def webhook_setup(config: str, url: str):
+    """Register webhook with Telegram"""
+    import asyncio
+    from telenotif.core.config import AppConfig
+    from telenotif.core.bot import TelegramBot
+
+    if not Path(config).exists():
+        click.echo(f"Error: Config file '{config}' not found", err=True)
+        return
+
+    with open(config) as f:
+        config_data = yaml.safe_load(f)
+
+    app_config = AppConfig(**config_data)
+    webhook_url = url or app_config.bot.webhook_url
+
+    if not webhook_url:
+        click.echo("Error: No webhook URL specified. Set bot.webhook_url in config or use --url", err=True)
+        return
+
+    full_url = f"{webhook_url.rstrip('/')}{app_config.bot.webhook_path}"
+    
+    async def setup():
+        bot = TelegramBot(app_config.bot.token)
+        result = await bot.set_webhook(full_url)
+        return result
+
+    result = asyncio.run(setup())
+    
+    if result.get("ok"):
+        click.echo(f"✓ Webhook registered: {full_url}")
+    else:
+        click.echo(f"✗ Failed: {result.get('description', 'Unknown error')}", err=True)
+
+
+@webhook.command("info")
+@click.option("--config", default="config.yaml", help="Path to config file")
+def webhook_info(config: str):
+    """Show current webhook status"""
+    import asyncio
+    from telenotif.core.config import AppConfig
+    from telenotif.core.bot import TelegramBot
+
+    if not Path(config).exists():
+        click.echo(f"Error: Config file '{config}' not found", err=True)
+        return
+
+    with open(config) as f:
+        config_data = yaml.safe_load(f)
+
+    app_config = AppConfig(**config_data)
+
+    async def get_info():
+        bot = TelegramBot(app_config.bot.token)
+        return await bot.get_webhook_info()
+
+    result = asyncio.run(get_info())
+    
+    if result.get("ok"):
+        info = result["result"]
+        click.echo(f"URL: {info.get('url') or '(not set)'}")
+        click.echo(f"Pending updates: {info.get('pending_update_count', 0)}")
+        if info.get("last_error_message"):
+            click.echo(f"Last error: {info['last_error_message']}")
+    else:
+        click.echo(f"✗ Failed: {result.get('description', 'Unknown error')}", err=True)
+
+
+@webhook.command("delete")
+@click.option("--config", default="config.yaml", help="Path to config file")
+def webhook_delete(config: str):
+    """Remove webhook"""
+    import asyncio
+    from telenotif.core.config import AppConfig
+    from telenotif.core.bot import TelegramBot
+
+    if not Path(config).exists():
+        click.echo(f"Error: Config file '{config}' not found", err=True)
+        return
+
+    with open(config) as f:
+        config_data = yaml.safe_load(f)
+
+    app_config = AppConfig(**config_data)
+
+    async def delete():
+        bot = TelegramBot(app_config.bot.token)
+        return await bot.delete_webhook()
+
+    result = asyncio.run(delete())
+    
+    if result.get("ok"):
+        click.echo("✓ Webhook deleted")
+    else:
+        click.echo(f"✗ Failed: {result.get('description', 'Unknown error')}", err=True)
+
+
 if __name__ == "__main__":
     cli()

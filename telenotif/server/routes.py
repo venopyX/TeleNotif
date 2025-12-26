@@ -3,7 +3,8 @@
 import logging
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Header
+import aiohttp
+from fastapi import FastAPI, HTTPException, Header, Request
 from jinja2 import Template
 
 from telenotif.core.config import EndpointConfig
@@ -11,6 +12,26 @@ from telenotif.core.interfaces import IPlugin
 from telenotif.utils import escape_markdown_v2
 
 logger = logging.getLogger(__name__)
+
+
+def build_inline_keyboard(buttons: list) -> dict | None:
+    """Build inline keyboard markup from button config"""
+    if not buttons:
+        return None
+    
+    keyboard = []
+    for row in buttons:
+        keyboard_row = []
+        for btn in row:
+            button = {"text": btn.text}
+            if btn.url:
+                button["url"] = btn.url
+            elif btn.callback_data:
+                button["callback_data"] = btn.callback_data
+            keyboard_row.append(button)
+        keyboard.append(keyboard_row)
+    
+    return {"inline_keyboard": keyboard}
 
 
 def setup_routes(app: FastAPI) -> None:
@@ -22,6 +43,10 @@ def setup_routes(app: FastAPI) -> None:
 
     for endpoint_config in config.endpoints:
         create_endpoint_handler(app, endpoint_config, bot, registry, config.server.api_key, templates)
+    
+    # Setup webhook endpoint if configured
+    if config.bot.webhook_url:
+        setup_webhook_handler(app, bot, config)
 
 
 def create_endpoint_handler(
@@ -107,6 +132,9 @@ def create_endpoint_handler(
 
             image_url = get_field(payload, "image_url")
             image_urls = get_field(payload, "image_urls", [])
+            
+            # Build inline keyboard if buttons configured
+            reply_markup = build_inline_keyboard(endpoint_config.buttons)
 
             # Send to all target chats
             results = []
@@ -130,6 +158,7 @@ def create_endpoint_handler(
                         chat_id=chat_id,
                         text=formatted_message,
                         parse_mode=parse_mode,
+                        reply_markup=reply_markup,
                     )
                 
                 msg_id = result.get("result", {}).get("message_id") if isinstance(result.get("result"), dict) else result.get("result", [{}])[0].get("message_id")
@@ -149,3 +178,50 @@ def create_endpoint_handler(
 
     app.post(endpoint_config.path)(handler)
     logger.info(f"Registered endpoint: {endpoint_config.path}")
+
+
+def setup_webhook_handler(app: FastAPI, bot, config) -> None:
+    """Setup webhook endpoint for receiving Telegram updates"""
+    
+    async def webhook_handler(request: Request):
+        """Handle incoming Telegram webhook updates"""
+        try:
+            update = await request.json()
+            logger.debug(f"Received webhook update: {update}")
+            
+            # Handle callback queries (button clicks)
+            if "callback_query" in update:
+                callback = update["callback_query"]
+                callback_id = callback["id"]
+                callback_data = callback.get("data", "")
+                user = callback.get("from", {})
+                
+                logger.info(f"Callback query: {callback_data} from user {user.get('id')}")
+                
+                # Find matching callback handler
+                for handler in config.callbacks:
+                    if handler.data == callback_data:
+                        # Answer the callback
+                        await bot.answer_callback_query(callback_id, handler.response)
+                        
+                        # Forward to URL if configured
+                        if handler.url:
+                            async with aiohttp.ClientSession() as session:
+                                await session.post(handler.url, json={
+                                    "callback_data": callback_data,
+                                    "user": user,
+                                    "message": callback.get("message", {}),
+                                })
+                        break
+                else:
+                    # No handler found, just acknowledge
+                    await bot.answer_callback_query(callback_id)
+            
+            return {"ok": True}
+            
+        except Exception as e:
+            logger.error(f"Webhook error: {e}", exc_info=True)
+            return {"ok": False, "error": str(e)}
+    
+    app.post(config.bot.webhook_path)(webhook_handler)
+    logger.info(f"Registered webhook endpoint: {config.bot.webhook_path}")

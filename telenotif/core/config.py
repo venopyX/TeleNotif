@@ -11,6 +11,8 @@ class BotConfig(BaseModel):
 
     token: str = Field(..., description="Telegram bot token")
     test_mode: bool = Field(default=False, description="Enable test mode")
+    webhook_url: str | None = Field(default=None, description="Public URL for webhook")
+    webhook_path: str = Field(default="/bot/webhook", description="Webhook endpoint path")
 
     @field_validator("token")
     @classmethod
@@ -22,6 +24,22 @@ class BotConfig(BaseModel):
                 raise ValueError(f"Environment variable {env_var} not set")
             return token
         return v
+
+    @field_validator("webhook_url")
+    @classmethod
+    def validate_webhook_url(cls, v: str | None) -> str | None:
+        if v and v.startswith("${") and v.endswith("}"):
+            env_var = v[2:-1]
+            return os.getenv(env_var)
+        return v
+
+
+class ButtonConfig(BaseModel):
+    """Configuration for inline keyboard button"""
+    
+    text: str = Field(..., description="Button text")
+    url: str | None = Field(default=None, description="URL to open")
+    callback_data: str | None = Field(default=None, description="Callback data")
 
 
 class EndpointConfig(BaseModel):
@@ -36,6 +54,7 @@ class EndpointConfig(BaseModel):
     plugin_config: dict[str, Any] = Field(default_factory=dict)
     labels: dict[str, str] = Field(default_factory=dict, description="Custom labels for keys")
     field_map: dict[str, str] = Field(default_factory=dict, description="Map payload fields to internal fields")
+    buttons: list[list[ButtonConfig]] = Field(default_factory=list, description="Inline keyboard buttons (rows)")
 
     @field_validator("path")
     @classmethod
@@ -96,11 +115,20 @@ class LoggingConfig(BaseModel):
     )
 
 
+class CallbackConfig(BaseModel):
+    """Configuration for button callback handlers"""
+    
+    data: str = Field(..., description="Callback data to match")
+    response: str | None = Field(default=None, description="Text response to send")
+    url: str | None = Field(default=None, description="URL to POST callback to")
+
+
 class AppConfig(BaseModel):
     """Root configuration model"""
 
     bot: BotConfig
     endpoints: list[EndpointConfig]
     templates: dict[str, str] = Field(default_factory=dict, description="Message templates")
+    callbacks: list[CallbackConfig] = Field(default_factory=list, description="Button callback handlers")
     server: ServerConfig = Field(default_factory=ServerConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)

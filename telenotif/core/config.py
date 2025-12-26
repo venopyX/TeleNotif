@@ -123,6 +123,15 @@ class CallbackConfig(BaseModel):
     url: str | None = Field(default=None, description="URL to POST callback to")
 
 
+class CommandConfig(BaseModel):
+    """Configuration for bot command handlers"""
+    
+    command: str = Field(..., description="Command to match (e.g., /start, /help)")
+    response: str | None = Field(default=None, description="Text response (supports Jinja2)")
+    parse_mode: str | None = Field(default=None, description="Parse mode for response")
+    buttons: list[list[ButtonConfig]] = Field(default_factory=list, description="Optional buttons")
+
+
 class AppConfig(BaseModel):
     """Root configuration model"""
 
@@ -130,5 +139,6 @@ class AppConfig(BaseModel):
     endpoints: list[EndpointConfig]
     templates: dict[str, str] = Field(default_factory=dict, description="Message templates")
     callbacks: list[CallbackConfig] = Field(default_factory=list, description="Button callback handlers")
+    commands: list[CommandConfig] = Field(default_factory=list, description="Bot command handlers")
     server: ServerConfig = Field(default_factory=ServerConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)

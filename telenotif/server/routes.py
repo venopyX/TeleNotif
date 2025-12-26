@@ -206,10 +206,8 @@ def setup_webhook_handler(app: FastAPI, bot, config) -> None:
                 # Find matching callback handler
                 for handler in config.callbacks:
                     if handler.data == callback_data:
-                        # Answer the callback
                         await bot.answer_callback_query(callback_id, handler.response)
                         
-                        # Forward to URL if configured
                         if handler.url:
                             async with aiohttp.ClientSession() as session:
                                 await session.post(handler.url, json={
@@ -219,8 +217,42 @@ def setup_webhook_handler(app: FastAPI, bot, config) -> None:
                                 })
                         break
                 else:
-                    # No handler found, just acknowledge
                     await bot.answer_callback_query(callback_id)
+            
+            # Handle messages (including commands)
+            elif "message" in update:
+                message = update["message"]
+                chat_id = str(message["chat"]["id"])
+                user = message.get("from", {})
+                text = message.get("text", "")
+                
+                # Check for commands
+                if text.startswith("/"):
+                    command = text.split()[0].split("@")[0]  # Handle /cmd@botname
+                    logger.info(f"Command: {command} from user {user.get('id')}")
+                    
+                    for handler in config.commands:
+                        if handler.command == command:
+                            # Render response with user context
+                            context = {
+                                "user": user,
+                                "chat_id": chat_id,
+                                "first_name": user.get("first_name", ""),
+                                "username": user.get("username", ""),
+                                "command": command,
+                            }
+                            
+                            response_text = Template(handler.response).render(**context) if handler.response else None
+                            
+                            if response_text:
+                                reply_markup = build_inline_keyboard(handler.buttons, context) if handler.buttons else None
+                                await bot.send_message(
+                                    chat_id=chat_id,
+                                    text=response_text,
+                                    parse_mode=handler.parse_mode,
+                                    reply_markup=reply_markup,
+                                )
+                            break
             
             return {"ok": True}
             

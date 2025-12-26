@@ -1,6 +1,6 @@
-# TeleNotif Usage Guide
+# Telegrify Usage Guide
 
-Complete guide for using TeleNotif in your projects.
+Complete guide for using Telegrify in your projects.
 
 ## Table of Contents
 
@@ -23,21 +23,21 @@ Complete guide for using TeleNotif in your projects.
 ### From PyPI
 
 ```bash
-pip install telenotif
+pip install telegrify
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/venopyx/telenotif.git
-cd telenotif
+git clone https://github.com/venopyx/telegrify.git
+cd telegrify
 pip install -e .
 ```
 
 ### Create a New Project
 
 ```bash
-telenotif init my_notifier
+telegrify init my_notifier
 cd my_notifier
 ```
 
@@ -374,19 +374,19 @@ bot:
 **2. Register webhook with Telegram:**
 
 ```bash
-telenotif webhook setup
+telegrify webhook setup
 ```
 
 **3. Verify webhook:**
 
 ```bash
-telenotif webhook info
+telegrify webhook info
 ```
 
 **4. Remove webhook (if needed):**
 
 ```bash
-telenotif webhook delete
+telegrify webhook delete
 ```
 
 ### Command Handlers
@@ -399,10 +399,10 @@ commands:
     response: |
       👋 Welcome {{ first_name }}!
       
-      I'm TeleNotif bot. I send notifications from your apps.
+      I'm Telegrify bot. I send notifications from your apps.
     buttons:
       - - text: "📚 Documentation"
-          url: "https://github.com/venopyx/telenotif"
+          url: "https://github.com/venopyx/telegrify"
 
   - command: "/help"
     response: |
@@ -472,7 +472,7 @@ Create `plugins/my_formatter.py`:
 
 ```python
 from typing import Any
-from telenotif import IPlugin
+from telegrify import IPlugin
 
 
 class GitHubFormatter(IPlugin):
@@ -521,7 +521,7 @@ endpoints:
 For plugins without config:
 
 ```python
-from telenotif import IFormatter
+from telegrify import IFormatter
 
 
 class SimpleFormatter(IFormatter):
@@ -533,7 +533,7 @@ class SimpleFormatter(IFormatter):
 
 ## Field Mapping
 
-Map incoming payload fields to TeleNotif's expected fields using dot notation for nested objects.
+Map incoming payload fields to Telegrify's expected fields using dot notation for nested objects.
 
 ### Configuration
 
@@ -567,7 +567,7 @@ endpoints:
 }
 ```
 
-TeleNotif automatically:
+Telegrify automatically:
 - Uses `product.featured_image` as the image
 - Uses `product.images` for gallery
 - Sends to `meta.notify_target` chat ID
@@ -606,17 +606,17 @@ curl -X POST http://localhost:8000/notify \
 
 ```bash
 # Development with auto-reload
-telenotif run --reload
+telegrify run --reload
 
 # Production
-telenotif run --host 0.0.0.0 --port 8000
+telegrify run --host 0.0.0.0 --port 8000
 ```
 
 ### Using Python Directly
 
 ```python
 # main.py
-from telenotif import create_app
+from telegrify import create_app
 
 if __name__ == "__main__":
     import uvicorn
@@ -632,7 +632,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
-CMD ["telenotif", "run"]
+CMD ["telegrify", "run"]
 ```
 
 ```bash
@@ -648,7 +648,7 @@ docker run -p 8000:8000 \
 ```yaml
 version: "3.8"
 services:
-  telenotif:
+  telegrify:
     build: .
     ports:
       - "8000:8000"
@@ -664,17 +664,17 @@ services:
 ### Systemd Service
 
 ```ini
-# /etc/systemd/system/telenotif.service
+# /etc/systemd/system/telegrify.service
 [Unit]
-Description=TeleNotif Notification Service
+Description=Telegrify Notification Service
 After=network.target
 
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/opt/telenotif
+WorkingDirectory=/opt/telegrify
 Environment=TELEGRAM_BOT_TOKEN=your-token
-ExecStart=/usr/local/bin/telenotif run
+ExecStart=/usr/local/bin/telegrify run
 Restart=always
 
 [Install]
@@ -682,8 +682,8 @@ WantedBy=multi-user.target
 ```
 
 ```bash
-sudo systemctl enable telenotif
-sudo systemctl start telenotif
+sudo systemctl enable telegrify
+sudo systemctl start telegrify
 ```
 
 ### Cloud Platforms
@@ -691,7 +691,7 @@ sudo systemctl start telenotif
 **Render.com:**
 1. Connect GitHub repo
 2. Set environment variables
-3. Start command: `telenotif run --host 0.0.0.0 --port $PORT`
+3. Start command: `telegrify run --host 0.0.0.0 --port $PORT`
 
 **Railway.app:**
 1. Connect repo
@@ -731,7 +731,7 @@ Response:
 1. Check bot token is correct
 2. Ensure bot is added to the chat/group
 3. For channels, bot must be admin
-4. Check `telenotif validate` output
+4. Check `telegrify validate` output
 
 ### Invalid chat_id
 
@@ -746,7 +746,7 @@ Use `parse_mode: "MarkdownV2"` and ensure special characters are escaped. The ma
 
 ### Rate limiting
 
-TeleNotif automatically retries with exponential backoff when rate limited. For high-volume use, consider:
+Telegrify automatically retries with exponential backoff when rate limited. For high-volume use, consider:
 - Multiple bot tokens
 - Message queuing
 - Batching notifications

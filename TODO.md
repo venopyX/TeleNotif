@@ -1,4 +1,4 @@
-# TeleNotif TODO
+# Telegrify TODO
 
 ## ✅ Completed (v0.9.0)
 - [x] Core package structure
@@ -68,7 +68,7 @@
 - [ ] OpenAPI/Swagger docs auto-generation
 - [ ] Config hot reload
 - [ ] Plugin marketplace / entry-point discovery
-- [ ] CLI: `telenotif plugin install <name>`
+- [ ] CLI: `telegrify plugin install <name>`
 
 ## 🤖 Version 2.0 - Bot Framework
 - [ ] Two-way communication (handle incoming messages)

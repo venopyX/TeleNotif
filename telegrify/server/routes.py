@@ -7,9 +7,9 @@ import aiohttp
 from fastapi import FastAPI, HTTPException, Header, Request
 from jinja2 import Template
 
-from telenotif.core.config import EndpointConfig
-from telenotif.core.interfaces import IPlugin
-from telenotif.utils import escape_markdown_v2
+from telegrify.core.config import EndpointConfig
+from telegrify.core.interfaces import IPlugin
+from telegrify.utils import escape_markdown_v2
 
 logger = logging.getLogger(__name__)
 

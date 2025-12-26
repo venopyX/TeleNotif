@@ -1,8 +1,8 @@
 """Tests for formatters"""
 
-from telenotif.formatters.plain import PlainFormatter
-from telenotif.formatters.markdown import MarkdownFormatter
-from telenotif.utils import escape_markdown_v2
+from telegrify.formatters.plain import PlainFormatter
+from telegrify.formatters.markdown import MarkdownFormatter
+from telegrify.utils import escape_markdown_v2
 
 
 def test_plain_formatter_simple_message():

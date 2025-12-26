@@ -1,5 +1,5 @@
 """FastAPI server components"""
 
-from telenotif.server.app import create_app
+from telegrify.server.app import create_app
 
 __all__ = ["create_app"]

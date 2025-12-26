@@ -1,5 +1,5 @@
 """CLI commands"""
 
-from telenotif.cli.commands import cli
+from telegrify.cli.commands import cli
 
 __all__ = ["cli"]

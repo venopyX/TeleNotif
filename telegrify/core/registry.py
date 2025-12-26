@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Union
 
-from telenotif.core.interfaces import IFormatter, IPlugin
+from telegrify.core.interfaces import IFormatter, IPlugin
 
 
 class PluginRegistry:

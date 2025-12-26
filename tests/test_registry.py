@@ -1,7 +1,7 @@
 """Tests for plugin registry"""
 
-from telenotif.core.registry import PluginRegistry
-from telenotif.formatters.plain import PlainFormatter
+from telegrify.core.registry import PluginRegistry
+from telegrify.formatters.plain import PlainFormatter
 
 
 def test_register_and_get_formatter():

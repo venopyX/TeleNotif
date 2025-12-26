@@ -2,7 +2,7 @@
 
 import pytest
 
-from telenotif.core.bot import TelegramBot
+from telegrify.core.bot import TelegramBot
 
 
 @pytest.mark.asyncio

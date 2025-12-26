@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from telenotif.formatters.base import BaseFormatter
+from telegrify.formatters.base import BaseFormatter
 
 
 class PlainFormatter(BaseFormatter):

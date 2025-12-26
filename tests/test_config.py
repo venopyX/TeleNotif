@@ -1,6 +1,6 @@
 """Tests for configuration loading and validation"""
 
-from telenotif.core.config import AppConfig, BotConfig, EndpointConfig
+from telegrify.core.config import AppConfig, BotConfig, EndpointConfig
 
 
 def test_bot_config_valid():

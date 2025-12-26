@@ -1,4 +1,4 @@
-"""Command-line interface for TeleNotif"""
+"""Command-line interface for Telegrify"""
 
 from pathlib import Path
 
@@ -10,14 +10,14 @@ import yaml
 @click.group()
 @click.version_option(version="0.9.0")
 def cli():
-    """TeleNotif - Simple Telegram Notification Framework"""
+    """Telegrify - Simple Telegram Notification Framework"""
     pass
 
 
 @cli.command()
 @click.argument("project_name")
 def init(project_name: str):
-    """Initialize a new TeleNotif project"""
+    """Initialize a new Telegrify project"""
     project_path = Path(project_name)
 
     if project_path.exists():
@@ -29,7 +29,7 @@ def init(project_name: str):
     project_path.mkdir()
     (project_path / "plugins").mkdir()
 
-    config_content = """# TeleNotif Configuration
+    config_content = """# Telegrify Configuration
 
 bot:
   token: "${TELEGRAM_BOT_TOKEN}"
@@ -55,9 +55,9 @@ logging:
 """
     (project_path / "config.yaml").write_text(config_content)
 
-    main_content = '''"""TeleNotif server entry point"""
+    main_content = '''"""Telegrify server entry point"""
 
-from telenotif import create_app
+from telegrify import create_app
 
 if __name__ == "__main__":
     import uvicorn
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     plugin_content = '''"""Example custom formatter plugin"""
 
 from typing import Any
-from telenotif import IPlugin
+from telegrify import IPlugin
 
 
 class OrderFormatter(IPlugin):
@@ -98,11 +98,11 @@ class OrderFormatter(IPlugin):
 '''
     (project_path / "plugins" / "example_formatter.py").write_text(plugin_content)
 
-    (project_path / "requirements.txt").write_text("telenotif>=1.0.0\n")
+    (project_path / "requirements.txt").write_text("telegrify>=1.0.0\n")
 
     readme = f"""# {project_name}
 
-TeleNotif notification service
+Telegrify notification service
 
 ## Setup
 
@@ -123,7 +123,7 @@ TeleNotif notification service
    ```bash
    python main.py
    # or
-   telenotif run
+   telegrify run
    ```
 """
     (project_path / "README.md").write_text(readme)
@@ -137,7 +137,7 @@ TeleNotif notification service
     click.echo(f"  cd {project_name}")
     click.echo(f"  # Edit config.yaml with your settings")
     click.echo(f"  export TELEGRAM_BOT_TOKEN='your-token'")
-    click.echo(f"  telenotif run")
+    click.echo(f"  telegrify run")
 
 
 @cli.command()
@@ -146,10 +146,10 @@ TeleNotif notification service
 @click.option("--port", default=None, type=int, help="Override port")
 @click.option("--reload", is_flag=True, help="Enable auto-reload")
 def run(config: str, host: str, port: int, reload: bool):
-    """Run the TeleNotif server"""
+    """Run the Telegrify server"""
     if not Path(config).exists():
         click.echo(f"Error: Config file '{config}' not found", err=True)
-        click.echo("Run 'telenotif init <project_name>' to create a new project")
+        click.echo("Run 'telegrify init <project_name>' to create a new project")
         return
 
     with open(config) as f:
@@ -159,10 +159,10 @@ def run(config: str, host: str, port: int, reload: bool):
     final_host = host or server_config.get("host", "0.0.0.0")
     final_port = port or server_config.get("port", 8000)
 
-    click.echo(f"Starting TeleNotif server on {final_host}:{final_port}")
+    click.echo(f"Starting Telegrify server on {final_host}:{final_port}")
 
     uvicorn.run(
-        "telenotif.server.app:create_app",
+        "telegrify.server.app:create_app",
         host=final_host,
         port=final_port,
         reload=reload,
@@ -179,7 +179,7 @@ def validate(config: str):
         return
 
     try:
-        from telenotif.core.config import AppConfig
+        from telegrify.core.config import AppConfig
 
         with open(config) as f:
             config_data = yaml.safe_load(f)
@@ -209,8 +209,8 @@ def webhook():
 def webhook_setup(config: str, url: str):
     """Register webhook with Telegram"""
     import asyncio
-    from telenotif.core.config import AppConfig
-    from telenotif.core.bot import TelegramBot
+    from telegrify.core.config import AppConfig
+    from telegrify.core.bot import TelegramBot
 
     if not Path(config).exists():
         click.echo(f"Error: Config file '{config}' not found", err=True)
@@ -246,8 +246,8 @@ def webhook_setup(config: str, url: str):
 def webhook_info(config: str):
     """Show current webhook status"""
     import asyncio
-    from telenotif.core.config import AppConfig
-    from telenotif.core.bot import TelegramBot
+    from telegrify.core.config import AppConfig
+    from telegrify.core.bot import TelegramBot
 
     if not Path(config).exists():
         click.echo(f"Error: Config file '{config}' not found", err=True)
@@ -279,8 +279,8 @@ def webhook_info(config: str):
 def webhook_delete(config: str):
     """Remove webhook"""
     import asyncio
-    from telenotif.core.config import AppConfig
-    from telenotif.core.bot import TelegramBot
+    from telegrify.core.config import AppConfig
+    from telegrify.core.bot import TelegramBot
 
     if not Path(config).exists():
         click.echo(f"Error: Config file '{config}' not found", err=True)

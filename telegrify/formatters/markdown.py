@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from telenotif.formatters.base import BaseFormatter
-from telenotif.utils import escape_markdown_v2
+from telegrify.formatters.base import BaseFormatter
+from telegrify.utils import escape_markdown_v2
 
 
 class MarkdownFormatter(BaseFormatter):

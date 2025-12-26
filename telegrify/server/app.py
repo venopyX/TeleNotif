@@ -6,11 +6,11 @@ from pathlib import Path
 import yaml
 from fastapi import FastAPI
 
-from telenotif.core.bot import TelegramBot
-from telenotif.core.config import AppConfig
-from telenotif.core.registry import PluginRegistry
-from telenotif.formatters import MarkdownFormatter, PlainFormatter
-from telenotif.server.routes import setup_routes
+from telegrify.core.bot import TelegramBot
+from telegrify.core.config import AppConfig
+from telegrify.core.registry import PluginRegistry
+from telegrify.formatters import MarkdownFormatter, PlainFormatter
+from telegrify.server.routes import setup_routes
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
     )
 
     app = FastAPI(
-        title="TeleNotif",
+        title="Telegrify",
         description="Simple Telegram notification framework",
         version="1.0.0",
     )
@@ -58,7 +58,7 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
             "formatters": registry.list_formatters(),
         }
 
-    logger.info(f"TeleNotif server initialized with {len(config.endpoints)} endpoints")
+    logger.info(f"Telegrify server initialized with {len(config.endpoints)} endpoints")
 
     return app
 

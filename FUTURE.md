@@ -1,4 +1,4 @@
-# TeleNotif Future Roadmap
+# Telegrify Future Roadmap
 
 Ideas and planned features for future versions.
 
@@ -153,10 +153,10 @@ metrics:
 ```
 
 Metrics:
-- `telenotif_messages_sent_total`
-- `telenotif_messages_failed_total`
-- `telenotif_request_duration_seconds`
-- `telenotif_telegram_api_latency_seconds`
+- `telegrify_messages_sent_total`
+- `telegrify_messages_failed_total`
+- `telegrify_request_duration_seconds`
+- `telegrify_telegram_api_latency_seconds`
 
 ### Webhook Logging
 Log all incoming webhooks for debugging.
@@ -314,8 +314,8 @@ curl -X POST http://localhost:8000/admin/reload
 Community plugins repository.
 
 ```bash
-telenotif plugin install github-formatter
-telenotif plugin install shopify-orders
+telegrify plugin install github-formatter
+telegrify plugin install shopify-orders
 ```
 
 ---

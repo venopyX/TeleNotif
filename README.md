@@ -1,11 +1,11 @@
-# TeleNotif
+# Telegrify
 
 > Simple, powerful Telegram notification framework with plugin support
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-TeleNotif receives HTTP webhooks and forwards them as formatted Telegram messages. Perfect for alerts, order notifications, monitoring, CI/CD pipelines, and any system that needs to notify users via Telegram.
+Telegrify receives HTTP webhooks and forwards them as formatted Telegram messages. Perfect for alerts, order notifications, monitoring, CI/CD pipelines, and any system that needs to notify users via Telegram.
 
 ## Features
 
@@ -29,13 +29,13 @@ TeleNotif receives HTTP webhooks and forwards them as formatted Telegram message
 ### 1. Install
 
 ```bash
-pip install telenotif
+pip install telegrify
 ```
 
 ### 2. Create Project
 
 ```bash
-telenotif init my_notifier
+telegrify init my_notifier
 cd my_notifier
 ```
 
@@ -57,7 +57,7 @@ endpoints:
 
 ```bash
 export TELEGRAM_BOT_TOKEN="your-bot-token"
-telenotif run
+telegrify run
 ```
 
 ### 5. Send Notification
@@ -132,14 +132,14 @@ logging:
 ## CLI Commands
 
 ```bash
-telenotif init <name>     # Create new project
-telenotif run             # Start server
-telenotif run --reload    # Start with auto-reload (dev)
-telenotif validate        # Validate config file
-telenotif webhook setup   # Register webhook with Telegram
-telenotif webhook info    # Show webhook status
-telenotif webhook delete  # Remove webhook
-telenotif --version       # Show version
+telegrify init <name>     # Create new project
+telegrify run             # Start server
+telegrify run --reload    # Start with auto-reload (dev)
+telegrify validate        # Validate config file
+telegrify webhook setup   # Register webhook with Telegram
+telegrify webhook info    # Show webhook status
+telegrify webhook delete  # Remove webhook
+telegrify --version       # Show version
 ```
 
 ## Custom Plugins
@@ -147,7 +147,7 @@ telenotif --version       # Show version
 Create `plugins/my_formatter.py`:
 
 ```python
-from telenotif import IPlugin
+from telegrify import IPlugin
 
 class MyFormatter(IPlugin):
     @property

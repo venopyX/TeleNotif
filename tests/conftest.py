@@ -40,6 +40,6 @@ def config_file(sample_config):
 @pytest.fixture
 def mock_bot():
     """Mock Telegram bot for testing"""
-    from telenotif.core.bot import TelegramBot
+    from telegrify.core.bot import TelegramBot
 
     return TelegramBot(token="test_token", test_mode=True)

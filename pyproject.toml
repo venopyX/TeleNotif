@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "telenotif"
+name = "telegrify"
 version = "0.9.0"
 description = "Simple Telegram notification framework with plugin support"
 authors = ["Gemechis Chala <gladsonchala@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/venopyx/telenotif"
-repository = "https://github.com/venopyx/telenotif"
-documentation = "https://github.com/venopyx/telenotif#readme"
+homepage = "https://github.com/venopyx/telegrify"
+repository = "https://github.com/venopyx/telegrify"
+documentation = "https://github.com/venopyx/telegrify#readme"
 keywords = ["telegram", "notifications", "bot", "webhook", "fastapi", "async"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -21,7 +21,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-packages = [{include = "telenotif"}]
+packages = [{include = "telegrify"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -43,7 +43,7 @@ ruff = "^0.1.6"
 mypy = "^1.7.0"
 
 [tool.poetry.scripts]
-telenotif = "telenotif.cli.commands:cli"
+telegrify = "telegrify.cli.commands:cli"
 
 [build-system]
 requires = ["poetry-core"]

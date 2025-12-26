@@ -28,7 +28,8 @@ class EndpointConfig(BaseModel):
     """Configuration for a single notification endpoint"""
 
     path: str = Field(..., description="API endpoint path")
-    chat_id: str = Field(..., description="Telegram chat ID or username")
+    chat_id: str | None = Field(default=None, description="Telegram chat ID or username")
+    chat_ids: list[str] = Field(default_factory=list, description="Multiple chat IDs")
     formatter: str = Field(default="plain", description="Formatter to use")
     template: str | None = Field(default=None, description="Template name to use")
     parse_mode: str | None = Field(default=None, description="Telegram parse mode")
@@ -45,7 +46,9 @@ class EndpointConfig(BaseModel):
 
     @field_validator("chat_id")
     @classmethod
-    def validate_chat_id(cls, v: str) -> str:
+    def validate_chat_id(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
         import logging
         logger = logging.getLogger(__name__)
         
@@ -53,12 +56,18 @@ class EndpointConfig(BaseModel):
             return v
         try:
             chat_id_int = int(v)
-            # Warn if looks like channel/supergroup but missing -100 prefix
             if chat_id_int > 0 and len(v) > 10:
                 logger.warning(f"chat_id '{v}' looks like a channel ID but is positive. Did you mean '-100{v}'?")
         except ValueError:
             logger.warning(f"chat_id '{v}' is not a valid numeric ID or @username")
         return v
+
+    def get_chat_ids(self) -> list[str]:
+        """Get all chat IDs (combines chat_id and chat_ids)"""
+        ids = list(self.chat_ids)
+        if self.chat_id:
+            ids.insert(0, self.chat_id)
+        return ids
 
 
 class ServerConfig(BaseModel):

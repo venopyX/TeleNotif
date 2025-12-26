@@ -70,9 +70,23 @@ def create_endpoint_handler(
             raise HTTPException(status_code=401, detail={"error": "invalid_api_key", "message": "Invalid or missing API key"})
 
         try:
-            chat_id = get_field(payload, "chat_id") or endpoint_config.chat_id
+            # Get chat IDs from payload or config
+            payload_chat_id = get_field(payload, "chat_id")
+            payload_chat_ids = get_field(payload, "chat_ids", [])
+            
+            if payload_chat_ids:
+                target_chat_ids = payload_chat_ids
+            elif payload_chat_id:
+                target_chat_ids = [payload_chat_id]
+            else:
+                target_chat_ids = endpoint_config.get_chat_ids()
+            
+            if not target_chat_ids:
+                raise HTTPException(status_code=400, detail={"error": "no_chat_id", "message": "No chat_id specified in config or request"})
 
             # Use template if specified, otherwise use formatter
+            parse_mode = get_field(payload, "parse_mode") or endpoint_config.parse_mode
+            
             if endpoint_config.template and endpoint_config.template in templates:
                 formatted_message = render_template(templates[endpoint_config.template], payload, parse_mode)
             else:
@@ -83,7 +97,6 @@ def create_endpoint_handler(
                         detail={"error": "formatter_not_found", "message": f"Formatter '{endpoint_config.formatter}' not found"},
                     )
 
-                # Set labels if formatter supports it
                 if hasattr(formatter, "labels"):
                     formatter.labels = endpoint_config.labels
 
@@ -92,39 +105,40 @@ def create_endpoint_handler(
                 else:
                     formatted_message = formatter.format(payload)
 
-            parse_mode = get_field(payload, "parse_mode") or endpoint_config.parse_mode
-
-            # Send to Telegram
             image_url = get_field(payload, "image_url")
             image_urls = get_field(payload, "image_urls", [])
 
-            if image_urls:
-                result = await bot.send_media_group(
-                    chat_id=chat_id,
-                    photo_urls=image_urls,
-                    caption=formatted_message,
-                    parse_mode=parse_mode,
-                )
-            elif image_url:
-                result = await bot.send_photo(
-                    chat_id=chat_id,
-                    photo_url=image_url,
-                    caption=formatted_message,
-                    parse_mode=parse_mode,
-                )
-            else:
-                result = await bot.send_message(
-                    chat_id=chat_id,
-                    text=formatted_message,
-                    parse_mode=parse_mode,
-                )
-
-            logger.info(f"Notification sent to {chat_id}")
+            # Send to all target chats
+            results = []
+            for chat_id in target_chat_ids:
+                if image_urls:
+                    result = await bot.send_media_group(
+                        chat_id=chat_id,
+                        photo_urls=image_urls,
+                        caption=formatted_message,
+                        parse_mode=parse_mode,
+                    )
+                elif image_url:
+                    result = await bot.send_photo(
+                        chat_id=chat_id,
+                        photo_url=image_url,
+                        caption=formatted_message,
+                        parse_mode=parse_mode,
+                    )
+                else:
+                    result = await bot.send_message(
+                        chat_id=chat_id,
+                        text=formatted_message,
+                        parse_mode=parse_mode,
+                    )
+                
+                msg_id = result.get("result", {}).get("message_id") if isinstance(result.get("result"), dict) else result.get("result", [{}])[0].get("message_id")
+                results.append({"chat_id": chat_id, "message_id": msg_id})
+                logger.info(f"Notification sent to {chat_id}")
 
             return {
                 "status": "sent",
-                "message_id": result.get("result", {}).get("message_id") if isinstance(result.get("result"), dict) else result.get("result", [{}])[0].get("message_id"),
-                "chat_id": chat_id,
+                "results": results,
             }
 
         except HTTPException:

@@ -14,8 +14,8 @@ from telenotif.utils import escape_markdown_v2
 logger = logging.getLogger(__name__)
 
 
-def build_inline_keyboard(buttons: list) -> dict | None:
-    """Build inline keyboard markup from button config"""
+def build_inline_keyboard(buttons: list, payload: dict = None) -> dict | None:
+    """Build inline keyboard markup from button config with template support"""
     if not buttons:
         return None
     
@@ -23,11 +23,16 @@ def build_inline_keyboard(buttons: list) -> dict | None:
     for row in buttons:
         keyboard_row = []
         for btn in row:
-            button = {"text": btn.text}
+            # Render templates if payload provided
+            text = Template(btn.text).render(**payload) if payload else btn.text
+            button = {"text": text}
+            
             if btn.url:
-                button["url"] = btn.url
+                url = Template(btn.url).render(**payload) if payload else btn.url
+                button["url"] = url
             elif btn.callback_data:
-                button["callback_data"] = btn.callback_data
+                callback = Template(btn.callback_data).render(**payload) if payload else btn.callback_data
+                button["callback_data"] = callback
             keyboard_row.append(button)
         keyboard.append(keyboard_row)
     
@@ -134,7 +139,7 @@ def create_endpoint_handler(
             image_urls = get_field(payload, "image_urls", [])
             
             # Build inline keyboard if buttons configured
-            reply_markup = build_inline_keyboard(endpoint_config.buttons)
+            reply_markup = build_inline_keyboard(endpoint_config.buttons, payload)
 
             # Send to all target chats
             results = []

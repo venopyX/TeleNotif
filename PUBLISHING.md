@@ -84,10 +84,24 @@ Or use environment variable:
 TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-xxx twine upload dist/*
 ```
 
-### 6. Push to GitHub
+### 6. Push to GitHub with Tag and Release
 
 ```bash
-git push origin main --tags
+# Push code
+git push origin main
+
+# Push tag (required - tags don't push automatically!)
+git push origin vX.Y.Z
+
+# Create GitHub release with artifacts
+gh release create vX.Y.Z dist/* \
+  --title "vX.Y.Z - Release Title" \
+  --notes "Release notes here"
+```
+
+Or generate release notes automatically from commits:
+```bash
+gh release create vX.Y.Z dist/* --generate-notes
 ```
 
 ---
@@ -152,13 +166,15 @@ vim CHANGELOG.md                      # Add changelog entry
 
 git add -A
 git commit -m "chore: bump version to X.Y.Z"
-git tag vX.Y.Z
+git tag -a vX.Y.Z -m "vX.Y.Z - Release title"
 
 rm -rf dist/
 python -m build
 twine upload dist/*
 
-git push origin main --tags
+git push origin main
+git push origin vX.Y.Z
+gh release create vX.Y.Z dist/* --title "vX.Y.Z - Title" --generate-notes
 ```
 
 ---

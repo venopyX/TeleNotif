@@ -7,7 +7,8 @@ license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/venopyx/telenotif"
 repository = "https://github.com/venopyx/telenotif"
-keywords = ["telegram", "notifications", "bot", "webhook"]
+documentation = "https://github.com/venopyx/telenotif#readme"
+keywords = ["telegram", "notifications", "bot", "webhook", "fastapi", "async"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -15,7 +16,12 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Topic :: Communications :: Chat",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
+packages = [{include = "telenotif"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"

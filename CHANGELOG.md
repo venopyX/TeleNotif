@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-12-27
+
+### Fixed
+- **MarkdownV2 Formatting**: Reworked the MarkdownV2 escaping logic to correctly preserve formatting (e.g., bold, italic) while escaping special characters. This resolves issues where messages were sent without the intended formatting.
+- **Jinja2 Templating**: Fixed a `TypeError` that occurred when using numerical comparisons in Jinja2 templates with `parse_mode: MarkdownV2`. The premature escaping of numbers as strings has been removed.
+
 ## [1.0.0] - 2025-12-27
 
 ### Added

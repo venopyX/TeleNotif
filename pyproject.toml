@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "telegrify"
-version = "1.0.0"
+version = "1.0.1"
 description = "Simple Telegram notification framework with plugin support"
 authors = ["Gemechis Chala <gladsonchala@gmail.com>"]
 license = "MIT"

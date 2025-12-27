@@ -27,56 +27,31 @@ MARKDOWN_SPECIAL_CHARS = ['_', '*', '`', '[']
 def escape_markdown_v2(text: Optional[Union[str, int, float]]) -> str:
     """
     Escape special characters for Telegram MarkdownV2 parse mode.
-
-    This function escapes all special characters defined in Telegram's MarkdownV2
-    specification to prevent parsing errors when sending messages.
-
-    Special characters that are escaped:
-    '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
-
-    Args:
-        text: The text to escape. Can be str, int, float, or None.
-              Non-string types will be converted to strings first.
-
-    Returns:
-        The escaped text with all special characters preceded by a backslash.
-        Returns empty string if input is None or empty.
-
-    Examples:
-        >>> escape_markdown_v2("Order #123")
-        'Order \\\\#123'
-
-        >>> escape_markdown_v2("Price: $10.50!")
-        'Price: $10\\\\.50\\\\!'
-
-        >>> escape_markdown_v2(None)
-        ''
-
-    Note:
-        This function is designed to work with plain text content. If you want
-        to preserve markdown formatting (bold, italic, etc.), you should not
-        escape the formatting characters in those specific parts.
+    This version first escapes everything, then "un-escapes" valid formatting.
     """
-    # Handle None or empty input
     if text is None:
         return ""
-
-    # Convert non-string types to string
     if not isinstance(text, str):
         text = str(text)
-
-    # Return empty string for empty input
     if not text:
         return ""
 
-    # Escape each special character with a backslash
-    # Using a character class regex for efficiency
-    # Note: The hyphen is placed at the end to avoid creating a range
+    # 1. First, escape all special characters.
     escape_chars = r'([_*\[\]()~`>#+=|{}.!\-])'
-
-    # Replace each match with a backslash followed by the matched character
     escaped_text = re.sub(escape_chars, r'\\\1', text)
 
+    # 2. Now, "un-escape" the formatting markers for valid, non-nested patterns.
+    # This regex looks for an escaped marker, content, and the same escaped marker.
+    # It's not perfect for nesting, but it's safer for this use case.
+    # Un-escape *bold*
+    escaped_text = re.sub(r'\\(\*)([^\*]+?)\\\1', r'\1\2\1', escaped_text)
+    # Un-escape _italic_
+    escaped_text = re.sub(r'\\(_)([^_]+?)\\(_)', r'\1\2\1', escaped_text)
+    # Un-escape ~strikethrough~
+    escaped_text = re.sub(r'\\(~)([^~]+?)\\(~)', r'\1\2\1', escaped_text)
+    # Un-escape `code` - note: this is a simple version
+    escaped_text = re.sub(r'\\(`)([^`]+?)\\(`)', r'\1\2\1', escaped_text)
+    
     return escaped_text
 
 

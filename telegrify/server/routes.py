@@ -80,16 +80,7 @@ def create_endpoint_handler(
 
     def render_template(template_str: str, payload: dict, parse_mode: str | None) -> str:
         """Render Jinja2 template with payload values"""
-        def escape_value(v):
-            if isinstance(v, list):
-                return [escape_markdown_v2(str(i)) if not isinstance(i, (dict, list)) else i for i in v]
-            if isinstance(v, dict):
-                return {k: escape_value(val) for k, val in v.items()}
-            return escape_markdown_v2(str(v))
-
-        if parse_mode == "MarkdownV2":
-            escaped_payload = {k: escape_value(v) for k, v in payload.items()}
-            return Template(template_str).render(**escaped_payload)
+        # Escaping is handled by sanitize_text in bot.py, so pass payload as-is to Jinja2
         return Template(template_str).render(**payload)
 
     async def handler(

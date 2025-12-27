@@ -5,6 +5,8 @@ import logging
 
 import aiohttp
 
+from telegrify.utils.escape import sanitize_text
+
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +33,9 @@ class TelegramBot:
             logger.info(f"TEST MODE - Would send to {chat_id}: {text}")
             return {"ok": True, "result": {"message_id": 0}}
 
-        payload = {"chat_id": chat_id, "text": text}
+        escaped_text = sanitize_text(text, parse_mode)
+
+        payload = {"chat_id": chat_id, "text": escaped_text}
         if parse_mode:
             payload["parse_mode"] = parse_mode
         if reply_markup:
@@ -54,7 +58,8 @@ class TelegramBot:
 
         payload = {"chat_id": chat_id, "photo": photo_url}
         if caption:
-            payload["caption"] = caption
+            escaped_caption = sanitize_text(caption, parse_mode)
+            payload["caption"] = escaped_caption
         if parse_mode:
             payload["parse_mode"] = parse_mode
 
@@ -77,7 +82,8 @@ class TelegramBot:
         for i, url in enumerate(photo_urls[:10]):  # Telegram limit: 10
             item = {"type": "photo", "media": url}
             if i == 0 and caption:
-                item["caption"] = caption
+                escaped_caption = sanitize_text(caption, parse_mode)
+                item["caption"] = escaped_caption
                 if parse_mode:
                     item["parse_mode"] = parse_mode
             media.append(item)

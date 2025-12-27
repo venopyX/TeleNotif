@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-27
+
+### Added
+- Universal environment variable support with `${VAR}` syntax for all config fields
+- Support for default values with `${VAR:-default}` syntax
+- CORS middleware with configurable origins
+- Root endpoint (`GET /`) showing version, status, and API info
+- Automatic .env file loading with python-dotenv
+- Better error messages for missing environment variables
+
+### Changed
+- **BREAKING**: All config fields now support env vars (may affect existing configs)
+- CLI init command now uses current development version in requirements.txt
+- Improved init template with comprehensive environment variable examples
+
+### Fixed
+- Chat ID validation now works with environment variables
+- CORS errors when accessing from frontend applications
+- CLI init generating incorrect telegrify version requirements
+
 ## [0.9.0] - 2025-12-26
 
 ### Added

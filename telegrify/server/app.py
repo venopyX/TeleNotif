@@ -28,7 +28,7 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
     app = FastAPI(
         title="Telegrify",
         description="Simple Telegram notification framework",
-        version="0.9.0",
+        version="1.0.0",
     )
 
     # Add CORS middleware
@@ -65,7 +65,7 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
     async def root():
         return {
             "name": "Telegrify",
-            "version": "0.9.0",
+            "version": "1.0.0",
             "description": "Simple Telegram notification framework",
             "status": "healthy",
             "endpoints": len(config.endpoints),

@@ -16,11 +16,13 @@ Telegrify receives HTTP webhooks and forwards them as formatted Telegram message
 - 🖼️ **Rich Media** - Single images, photo galleries (up to 10)
 - 🎹 **Inline Keyboards** - Interactive buttons with dynamic templates
 - 🤖 **Command Handlers** - Respond to /start, /help, etc.
+- 🌐 **Environment Variables** - Universal `${VAR}` support in all config fields
 - 🏷️ **Custom Labels** - Map `order_id` → `🆔 Order ID`
 - 🔀 **Field Mapping** - Map nested JSON fields with dot notation
 - 📝 **Jinja2 Templates** - Conditionals, loops, filters
 - 🎨 **Formatters** - Plain text, Markdown, or custom plugins
 - 🔒 **Secure** - API key authentication
+- 🌍 **CORS Ready** - Configurable CORS for web frontends
 - ♻️ **Reliable** - Automatic retries with exponential backoff
 - 🐳 **Docker Ready** - Easy containerized deployment
 
@@ -124,9 +126,31 @@ server:
   host: "0.0.0.0"
   port: 8000
   api_key: "${API_KEY}"            # Optional authentication
+  cors_origins: ["*"]              # CORS allowed origins
 
 logging:
   level: "INFO"                    # DEBUG, INFO, WARNING, ERROR
+```
+
+## Environment Variables
+
+All config fields support `${VAR}` syntax with optional defaults:
+
+```yaml
+bot:
+  token: "${TELEGRAM_BOT_TOKEN}"
+  webhook_url: "${WEBHOOK_URL}"
+
+server:
+  port: "${PORT:-8000}"            # Use PORT or default to 8000
+  cors_origins: ["${CORS_ORIGIN:-*}"]
+```
+
+Create `.env` file:
+```bash
+TELEGRAM_BOT_TOKEN=your_bot_token
+WEBHOOK_URL=https://yourapp.onrender.com
+PORT=3000
 ```
 
 ## CLI Commands

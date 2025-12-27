@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "telegrify"
-version = "0.9.0"
+version = "1.0.0"
 description = "Simple Telegram notification framework with plugin support"
 authors = ["Gemechis Chala <gladsonchala@gmail.com>"]
 license = "MIT"
@@ -10,7 +10,7 @@ repository = "https://github.com/venopyx/telegrify"
 documentation = "https://github.com/venopyx/telegrify#readme"
 keywords = ["telegram", "notifications", "bot", "webhook", "fastapi", "async"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",

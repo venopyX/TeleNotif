@@ -8,7 +8,7 @@ import yaml
 
 
 @click.group()
-@click.version_option(version="0.9.0")
+@click.version_option(version="1.0.0")
 def cli():
     """Telegrify - Simple Telegram Notification Framework"""
     pass
